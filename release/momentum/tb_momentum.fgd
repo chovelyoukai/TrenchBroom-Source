@@ -1,0 +1,494 @@
+// Source FGD for TrenchBroom
+// Licensed under the GPL v3
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// World entity definition
+///////////////////////////////////////////////////////////////////////////////////////////
+
+@SolidClass = worldspawn : "World Entity"
+[
+	message(string) : "Map description"
+	skyname(string) : "SkyBox Texture Name" : "sky_day01_01"
+	chaptertitle(string) : "Chapter Title Message" : "" : "Chapter Title that appears onscreen when this level starts."
+	startdark(choices) : "Level Fade In" : 0 =
+	[	
+		0 : "No"
+		1 : "Yes"
+	]
+	detailvbsp(string) : "Detail.vbsp file" : "detail.vbsp" : "Detail.vbsp file to use for emitting detail props (found in directory <root>/modname)"
+	detailmaterial(string) : "Detail material file" : "detail/detailsprites" : "Material for detail sprites to use for drawing detail props"
+	coldworld(choices) : "World is cold" : 0 =
+	[	
+		0 : "No"
+		1 : "Yes"
+	]
+]
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// base class definitions
+///////////////////////////////////////////////////////////////////////////////////////////
+
+@BaseClass = Angles
+[ 
+	angles(string) : "Pitch Yaw Roll (Y Z X)" : "0 0 0" : "This entity's orientation in the world. Pitch is rotation around the Y axis, " +
+		"yaw is the rotation around the Z axis, roll is the rotation around the X axis."
+]
+
+@BaseClass = Targetname
+[
+	targetname(target_source) : "Name"
+]
+
+@BaseClass = Parentname
+[ 
+	parentname(string) : "Parent" : : "The name of this entity's parent in the movement hierarchy. Entities with parents move with their parent."
+]
+
+@BaseClass = Target
+[
+	target(target_destination) : "Target"
+	killtarget(target_destination) : "Killtarget"
+]
+
+@BaseClass = EnableDisable
+[
+	StartDisabled(choices) : "Start Disabled" : 0 =
+	[
+		0 : "No"
+		1 : "Yes"
+	]
+]
+
+@BaseClass = RenderFxChoices
+[
+	renderfx(choices) :"Render FX" : 0 =
+	[
+		0: "Normal"
+		1: "Slow Pulse"
+		2: "Fast Pulse"
+		3: "Slow Wide Pulse"
+		4: "Fast Wide Pulse"
+		9: "Slow Strobe"
+		10: "Fast Strobe"
+		11: "Faster Strobe"
+		12: "Slow Flicker"
+		13: "Fast Flicker"
+		5: "Slow Fade Away"
+		6: "Fast Fade Away"
+		7: "Slow Become Solid"
+		8: "Fast Become Solid"
+		14: "Constant Glow"
+		15: "Distort"
+		16: "Hologram (Distort + fade)"
+		23: "Cull By Distance (TEST)"
+		24: "Spotlight FX"
+		26: "Fade Near"
+	]
+]
+
+@BaseClass = Shadow
+[
+	disableshadows(choices) : "Disable shadows" : 0 =
+	[
+		0 : "No"
+		1 : "Yes"
+	]
+]
+
+@BaseClass base(RenderFxChoices) = RenderFields 
+[
+	rendermode(choices) : "Render Mode" : 0 : "Used to set a non-standard rendering mode on this entity. See also 'FX Amount' and 'FX Color'." =
+	[
+		0: "Normal"
+		1: "Color"
+		2: "Texture"
+		3: "Glow"
+		4: "Solid"
+		5: "Additive"
+		7: "Additive Fractional Frame"
+		9: "World Space Glow"
+		10: "Dont Render"
+	]
+	renderamt(integer) : "FX Amount (0 - 255)" : 255 : "The FX amount is used by the selected Render Mode."
+	rendercolor(string) : "FX Color (R G B)" : "255 255 255" : "The FX color is used by the selected Render Mode."
+
+	disablereceiveshadows(choices) : "Disable Receiving Shadows" : 0 =
+	[
+		0 : "No"
+		1 : "Yes"
+	]
+]
+
+@BaseClass = DXLevelChoice
+[ 
+	mindxlevel(choices) : "Minimum DX Level" : 0 = 
+	[
+		0 : "default (lowest)"
+		70 : "dx7"
+		80 : "dx8.0 (4600Ti)"
+		81 : "dx8.1 (FX5200)"
+		90 : "dx9 SM2.0"
+		95 : "dx9 SM3.0"
+	]
+	maxdxlevel(choices) : "Maximum DX Level" : 0 = 
+	[
+		0 : "default (highest)"
+		60 : "dx6"
+		70 : "dx7"
+		80 : "dx8.0 (4600Ti)"
+		81 : "dx8.1 (FX5200)"
+		90 : "dx9 SM2.0"
+		95 : "dx9 SM3.0"
+	]
+]
+
+@BaseClass = Inputfilter
+[
+	InputFilter(choices) : "Input Filter" : 0 : "Used to specify which inputs this entity will accept." =
+	[
+		0 : "Allow all inputs"
+		8 : "Ignore Touch/Untouch"
+		16 : "Ignore Use"
+		32 : "Ignore All"
+	]
+]
+
+@BaseClass = Global 
+[ 
+	globalname(string) : "Global Entity Name" : "" : "Name by which this entity is linked to another entity in a different map. When the player transitions to a new map, entities in the new map with globalnames matching entities in the previous map will have the previous map's state copied over their state."
+]
+
+@BaseClass base(Targetname, Parentname, EnableDisable, Global) = TriggerOnce
+[
+	spawnflags(flags) = 
+	[
+		1: "Clients" : 1
+		2: "NPCs" : 0
+		4: "Pushables": 0
+		8: "Physics Objects" : 0
+		16: "Only player ally NPCs" : 0
+		32: "Only clients in vehicles" : 0
+		64: "Everything (not including physics debris)" : 0
+		512: "Only clients *not* in vehicles" : 0
+		1024: "Physics debris" : 0
+		2048: "Only NPCs in vehicles (respects player ally flag)" : 0
+		4096: "Disallow Bots" : 0
+	]
+
+	filtername(string) : "Filter Name" : : "Filter to use to see if activator triggers me. See filter_activator_name for more explanation."
+]
+
+@BaseClass base(Targetname, Parentname, EnableDisable, TriggerOnce) = Trigger []
+
+@BaseClass base(MomentumTrigger) = ZoneTrigger
+[
+    zone_number(integer) : "Zone Number" : 0 : "The zone number of this trigger. NOTE: 0 is reserved for invalid/stop trigger, 1 is reserved for start! 2+ are free for your stage/checkpoint triggers, so start at 2!"
+]
+
+@BaseClass = TrackNum
+[
+    track_number(integer) : "Track Number" : -1 : "Track number that this entity belongs to. -1 = all tracks, 0 = main map, > 0 = bonus zone (of that number)."
+]
+
+@BaseClass base(Trigger, TrackNum) = MomentumTrigger []
+
+@BaseClass base(MomentumTrigger) = TeleTrigger
+[
+    target(string) : "Remote Destination" : "" : "The entity specifying the point to which the player should be teleported."
+	
+    landmark(string) : "Local Destination Landmark" : "" : "In landmark mode, teleported entities are offset from the target by their initial offset from the landmark, angles and velocity are also reoriented to the destination if enabled."
+    
+    velocityscale(string) : "Velocity Scale Factor (X Y Z)" : "1 1 1" : "Scale the player's velocity per-axis"
+    
+    mode(choices) : "Teleport mode" : 0 = 
+    [
+        0 : "Default (do nothing)"
+        1 : "Reset velocity"
+        2 : "Keep negative Z (downwards) velocity only"
+        3 : "Redirect velocity to destination angles"
+        4 : "Landmark teleport"
+        5 : "Defrag mode"
+    ]
+	
+	reorient_landmark(choices) : "Reorient Landmark" : 0 : "(Landmark mode only) Reorient origin, angles and velocity from the landmark's local space to the destination's. This means the destination room does not have to face the same way." =
+    [
+        0 : "No"
+        1 : "Yes"
+    ]
+    
+    resetang(choices) : "Reset the player angles on teleport" : 1 =
+    [
+        0 : "No"
+        1 : "Yes"
+    ]
+    
+    fail(choices) : "Indicates whether this teleport is for failing a level" : 0 =
+    [
+        0 : "No"
+        1 : "Yes"
+    ]
+	
+	spawnflags(flags) =
+    [
+        8388608: "Teleport the player on EndTouch() instead of StartTouch()" : 0
+    ]
+]
+
+@BaseClass
+	size(-24 -24 -40, 24 24 40)
+	color(0 64 0) = PlayerClass []
+
+@BaseClass color(255 255 0) = Light
+[
+	_light(string) : "Brightness" : "255 255 255 400" : "The RGB color and brightness of the light. Colors must be between 0 and 255; brightness can be anything."
+	_lightHDR(string) : "HDR Brightness" : "-1 -1 -1 1" : "Brightness override used in HDR mode. Default is -1 -1 -1 1, which means no change."
+	_lightHDRscale(integer) : "HDR Brightness Scale" : 1 : "A simple intensity multiplier used when compiling HDR lighting."
+	style(choices) : "Appearance" : 0 =
+	[
+		0 : "Normal"
+		10 : "Flourescent flicker"
+		2 : "Slow deep pulse"
+		11 : "Slow shallow pulse"
+		5 : "Gentle pulse"
+		1 : "Flicker A"
+		6 : "Flicker B"
+		3 : "Candle A"
+		7 : "Candle B"
+		8 : "Candle C"
+		4 : "Fast strobe"
+		9 : "Slow strobe"
+	]
+	pattern(string) : "Custom Appearance" : "" : "A string of characters, like a sequence of piano keys, that define a pattern of brightness. a is dark and z is full intensity. Applies only to lights with a targetname."
+	_constant_attn(integer) : "Constant Attenuation" : 0
+	_quadratic_attn(integer) : "Quadratic Attenuation" : 1
+	_linear_attn(integer) : "Linear Attenuation" : 0
+	_fifty_percent_distance(string) : "50 percent falloff distance" : ""
+	_zero_percent_distance(string) : "0 percent falloff distance" : ""
+	_hardfalloff(integer) : "Hard Falloff" : 0 : "Causes lights to fall to exactly zero beyond the 0% distance. May cause unrealistic lighting if not used carefully."
+]
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// point entities
+///////////////////////////////////////////////////////////////////////////////////////////
+
+@PointClass base(PlayerClass) = info_player_start
+	: "Player spawn" []
+
+@PointClass base(PlayerClass) = info_teleport_destination
+	: "Teleporter destination"
+[
+    targetname(string) : "The name that other entities refer to this by" : ""
+]
+
+@PointClass color(200 150 150) = info_null
+	: "Removed as soon as a map is loaded" []
+	
+@PointClass color(200 150 150) = info_target
+	: "Generic target" []
+
+@PointClass size(-8 -8 -8, 8 8 8) base(Light, Targetname)
+	= light : "Point light source" []
+	
+@PointClass base(Angles) iconsprite("editor/light_env.vmt") = light_environment : 
+"Sets the color and angle of the light from the sun and sky."
+[
+	pitch(integer) : "Pitch" : 0 : "The downward pitch of the light from the sun. 0 is horizontal, -90 is straight down."
+	_light(string) : "Brightness" : "255 255 255 200"
+	_ambient(string) : "Ambient" : "255 255 255 20"
+	_lightHDR(string) : "BrightnessHDR" : "-1 -1 -1 1"
+	_lightscaleHDR(integer) : "BrightnessScaleHDR" : 1 : "Amount to scale the light by when compiling for HDR."
+	_ambientHDR(string) : "AmbientHDR" : "-1 -1 -1 1"
+	_AmbientScaleHDR(integer) : "AmbientScaleHDR" : 1 : "Amount to scale the ambient light by when compiling for hdr."
+	pitch(integer) : "Pitch" : 0 : "The downward pitch of the light from the sun. 0 is horizontal, -90 is straight down."
+	SunSpreadAngle(integer) : "SunSpreadAngle" : 0 : "The angular extent of the sun for casting soft shadows. Higher numbers are more diffuse. 5 is a good starting value."
+]
+	
+@PointClass base(Angles) size(-16 -16 -16, 16 16 16) color(0 0 255) = sky_camera : 
+"An entity used to control the 3D Skybox. Its origin is used to determine the 3D Skybox's position relative to the map. Place this entity, in the 3D Skybox, at the point where the origin of the map should be."
+[
+	scale(integer) : "3D Skybox scale" : 16 : "Scale of the skybox."
+	fogenable(choices) : "Fog Enable" : 0 =
+	[
+		0 : "No"
+		1 : "Yes"
+	]
+	fogblend(choices) : "Fog Blend" : 0 =
+	[
+		0 : "No"
+		1 : "Yes"
+	]
+	use_angles(choices) : "Use Angles for Fog Dir" : 0 =
+	[
+		0 : "No"
+		1 : "Yes"
+	]
+	fogcolor(string) : "Primary Fog Color" : "255 255 255"
+	fogcolor2(string) : "Secondary Fog Color" : "255 255 255"
+	fogdir(string) : "Primary Fog Dir" : "1 0 0"
+	fogstart(string) : "Fog Start" : "500.0" : "Distance at which the skybox fog should start."
+	fogend(string) : "Fog End" : "2000.0" : "Distance at which the skybox fog should be fully opaque."
+]
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// solid entities
+///////////////////////////////////////////////////////////////////////////////////////////
+
+@SolidClass = func_illusionary : "Static nonsolid model" []
+@SolidClass = func_group : "Group of brushes (no effect in game)" []
+@SolidClass = func_detail []
+
+@SolidClass base(Targetname) sphere(DisappearDist) = func_lod : 
+	"Brush-built model that fades out over a specified distance. Useful for creating world detail that doesn't need to be drawn far away, for performance reasons."
+[
+	DisappearDist(integer)    : "Disappear Distance" : 2000 : "Distance at which these brushes should fade out."
+	Solid(choices) : "Solid" : 0 : "Set whether or not these brushes should collide with other entities." =
+	[
+		0: "Solid"
+		1: "Nonsolid"
+	]
+]
+
+@SolidClass base(Targetname, EnableDisable) = func_clip_vphysics : 
+	"A brush entity that's considered solid to vphysics." 
+[
+	filtername(filterclass) : "Filter Name" : : "Filter to use to see if activator collides with me. See filter_activator_name for more explanation. Allow means 'Allow to Block' for this entity."
+]
+
+@SolidClass base(Targetname, Parentname, RenderFields, Global, Inputfilter, EnableDisable, Shadow) = func_brush : 
+	"A brush built entity with various features." 
+[
+	spawnflags(flags) =
+	[
+		2: "Ignore player +USE" : 1
+	]
+
+	_minlight(string) : "Minimum Light Level" : : "The minimum level of ambient light that hits this brush."
+	Solidity(choices) : "Solidity" : 0 : "Used to control the solidity/collision of these brushes." =
+	[
+		0 : "Toggle"
+		1 : "Never Solid"
+		2 : "Always Solid"
+	]
+	excludednpc(string) : "NPC class excluded from collisions" : "" : "If an NPC classname is specified here, NPCs of that type won't collide with these brushes. In Episodic, you may also specify an individual entity's name."
+	invert_exclusion(choices) : "Invert NPC class exclusion" : 0 : "If set, then the excluded NPC class will consider this brush solid, and all other NPC classes will consider it non-solid." =
+	[
+		0 : "No"
+		1 : "Yes"
+	]	
+
+	solidbsp(choices) : "Solid BSP" : 0 : "Set this if this brush is in heirarchy with a moving object of some kind, and the player can stand on this brush." =
+	[
+		0 : "No"
+		1 : "Yes"
+	]	
+	vrad_brush_cast_shadows(choices) : "Shadows" : 0 : "Set this if this brush casts lightmap shadows." =
+	[
+		0 : "No"
+		1 : "Yes"
+	]
+]
+
+// triggers
+@SolidClass base(Trigger) = trigger_gravity : 
+	"A trigger volume that changes the gravity on any entity that touches it."
+[
+	gravity(integer) : "Gravity (0-1)" : 1
+]
+@SolidClass base(Trigger, Targetname) = trigger_hurt :
+	"A trigger volume that damages entities that touch it."
+[
+	damage(integer) : "Damage" : 10 : "The amount of damage done to entities that touch this trigger. The damage is done every half-second. See also 'Damage Model' for extra details on how damage can be dealt."
+	damagecap(integer) : "Damage Cap" : 20 : "Maximum damage dealt per second. This field is only used if you select the Doubling w/Forgiveness damage model, via the spawnflag."
+	damagetype(choices) : "Damage Type" : 0 =
+	[
+		0 : "GENERIC"
+		1 : "CRUSH"
+		2 : "BULLET"
+		4 : "SLASH"
+		8 : "BURN"
+		16 : "FREEZE"
+		32 : "FALL"
+		64 : "BLAST"
+		128 : "CLUB"
+		256 : "SHOCK"
+		512 : "SONIC"
+		1024 : "ENERGYBEAM"
+		16384: "DROWN"
+		32768 : "PARALYSE"
+		65536 : "NERVEGAS"
+		131072 : "POISON"
+		262144 : "RADIATION"
+		524288 : "DROWNRECOVER"
+		1048576 : "CHEMICAL"
+		2097152 : "SLOWBURN"
+		4194304 : "SLOWFREEZE"
+	]
+
+	damagemodel(choices) : "Damage Model" : 0 : "How damage is dealt. Normal always does the specified amount of damage each half second. Doubling starts with the specified amount and doubles it each time it hurts the toucher. Forgiveness means that if the toucher gets out of the trigger the damage will reset to the specified value. Good for making triggers that are deadly over time without having to cause massive damage on each touch." =
+	[
+		0 : "Normal"
+		1 : "Doubling w/forgiveness"
+	]
+	
+	nodmgforce(choices) : "Zero Damage Force" : 0 : "Should the damaged entity receive no physics force from this trigger." =
+	[
+		0 : "No"
+		1 : "Yes"
+	]
+]
+@SolidClass base(Trigger) = trigger_once : "One-time trigger" []
+@SolidClass base(Trigger) = trigger_multiple : "Many-time trigger" []
+
+@SolidClass base(Trigger, TeleTrigger) = trigger_teleport : "Teleporter"
+[
+	spawnflags(flags) =
+	[
+		32: "Preserve angles even when a local landmark is not specified" : 0
+	]
+]
+
+@SolidClass base(Trigger) = trigger_push : 
+	"A trigger volume that pushes entities that touch it."
+[
+	pushdir(string) : "Push Direction (Pitch Yaw Roll)" : "0 0 0" : "Angles indicating the direction to push touched entities."
+
+	spawnflags(flags) = 
+	[ 
+		128: "Once Only" : 0
+		256: "Affects Ladders (Half-Life 2)" : 0 
+	]
+
+	speed(integer) : "Speed of Push" : 40 : "The speed at which to push entities away, in inches / second."
+	alternateticksfix(integer) : "Scale force for alternate ticks" : 0 : "If nonzero, scale the force by this amount when running with alternate ticks. This fixes problems with an overly large force due to the longer frametime on when running with sv_alternateticks 1."
+]
+	
+@SolidClass base(ZoneTrigger) = trigger_momentum_timer_start : "Trigger that starts the timer." 
+[
+    speed_limit(integer) : "Speed limit (UPS)" : 350 : "Max speed (Units Per Second) the player will be able to have, depending on the limit speed type."
+    look_angles(string) : "Look angles" : "0 0 0" : "Where player will look when teleported to start."
+    start_on_jump(integer) : "Start timer on jump" : 1 : "Start the timer when the player jump in the start zone/trigger zone."
+    speed_limit_type(integer) : "Limit speed type" : 0 : "0) Limit the speed of the player no matter what. 1) Limit the speed only in air. 2) Limit the speed only on ground. 3) Limit the speed only on landing."
+    teleport_destination(string) : "Remote Destination" : "" : "The entity specifying the point to which the player should be teleported when restarting a run."
+
+    spawnflags(flags) =
+    [
+        8192: "Limit leave speed" : 1
+        16384: "Use look angles" : 0
+    ]
+]
+
+@SolidClass base(ZoneTrigger) = trigger_momentum_timer_stop : "Trigger that stops the timer."
+[
+    cancel(choices) : "Cancel Timer" : 0 : "If true, the run will not be submitted." =
+    [
+        0 : "False"
+        1 : "True"
+    ]
+]
+
+@SolidClass base(ZoneTrigger) = trigger_momentum_timer_stage : "Starting trigger for each stage of a map. trigger_momentum_timer_start is automatically stage 1!" 
+[
+    teleport_destination(string) : "Remote Destination" : "" : "The entity specifying the point to which the player should be teleported when restarting a stage."
+]
+
+@SolidClass base(ZoneTrigger) = trigger_momentum_timer_checkpoint : "Trigger used to denote progress in a linear map. trigger_momentum_timer_start is automatically checkpoint (zone number) 1!" []
