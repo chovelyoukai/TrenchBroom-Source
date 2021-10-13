@@ -38,6 +38,7 @@ public class Map
 
 		String line;
 		int level = 0;
+		boolean skipping = false;
 		while (mapScanner.hasNextLine())
 		{
 			line = mapScanner.nextLine();
@@ -48,7 +49,7 @@ public class Map
 				continue;
 			}
 
-			if (line.startsWith("{"))
+			if (line.startsWith("{") && !skipping)
 			{
 				if (level == 0)
 				{
@@ -69,17 +70,25 @@ public class Map
 			}
 			else if (line.startsWith("}"))
 			{
+				if (skipping)
+				{
+					skipping = false;
+					continue;
+				}
 				if (level == 1)
 				{
 					entities.add(entity);
 				}
 				else
 				{
-					entity.brushes.add(brush);
+					if (brush != null)
+					{
+						entity.brushes.add(brush);
+					}
 				}
 				level--;
 			}
-			else if (line.startsWith("("))
+			else if (line.startsWith("(") && !skipping)
 			{
 				planeCount++;
 				plane = new Plane(standardFormat);
@@ -90,7 +99,7 @@ public class Map
 				}
 
 			}
-			else if (line.startsWith("\""))
+			else if (line.startsWith("\"") && !skipping)
 			{
 				kv = new KeyValue();
 				shouldAdd = kv.parseKeyValue(line);
@@ -98,6 +107,12 @@ public class Map
 				{
 					entity.keyValues.add(kv);
 				}
+			}
+			else if (line.startsWith("patchDef"))
+			{
+				brushCount--;
+				brush = null;
+				skipping = true;
 			}
 		}
 

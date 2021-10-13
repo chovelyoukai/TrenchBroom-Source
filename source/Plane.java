@@ -19,8 +19,6 @@ public class Plane
 	{
 		this.id = id;
 
-		System.out.println(plane);
-
 		plane = plane.replace("(", "");
 		plane = plane.replace(")", "");
 		plane = plane.replace("[", "");
