@@ -1,6 +1,7 @@
 public class KeyValue
 {
 	public String key, value;
+	public boolean connection;
 	
 	public KeyValue()
 	{
@@ -8,7 +9,7 @@ public class KeyValue
 		value = new String();
 	}
 	
-	public boolean parseKeyValue(String keyValue)
+	public int parseKeyValue(String keyValue)
 	{
 		keyValue = keyValue.replace("\" \"", "\"");
 		String[] tokens = keyValue.split("\"");
@@ -17,10 +18,17 @@ public class KeyValue
 		
 		if (key.equals("mapversion") || key.startsWith("_tb"))
 		{
-			return false;
+			return 0;
+		}
+		if (key.startsWith("*"))
+		{
+			tokens = value.split(",");
+			key = tokens[0];
+			value = value.substring(value.indexOf(',') + 1);
+			return 2;
 		}
 		
-		return true;
+		return 1;
 	}
 	
 	public void print()

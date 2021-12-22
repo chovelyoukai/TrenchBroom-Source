@@ -25,7 +25,6 @@ public class Map
 		Brush brush = null;
 		Plane plane = null;
 		KeyValue kv = null;
-		boolean shouldAdd;
 		Scanner mapScanner;
 		try
 		{
@@ -102,10 +101,17 @@ public class Map
 			else if (line.startsWith("\"") && !skipping)
 			{
 				kv = new KeyValue();
-				shouldAdd = kv.parseKeyValue(line);
-				if (shouldAdd && entity != null)
+				int shouldAdd = kv.parseKeyValue(line);
+				if (entity != null)
 				{
-					entity.keyValues.add(kv);
+					if (shouldAdd == 1)
+					{
+						entity.keyValues.add(kv);
+					}
+					else if (shouldAdd == 2)
+					{
+						entity.connections.add(kv);
+					}
 				}
 			}
 			else if (line.startsWith("patchDef"))
