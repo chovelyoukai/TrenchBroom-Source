@@ -16,17 +16,17 @@ public class MapToVmf
 
 		for (int i = 0; i < args.length; i++)
 		{
-			if (args[i].equals("-lightmapscale"))
+			if (args[i].equals("--lightmapscale") || args[i].equals("-l"))
 			{
 				lightMapScale = Integer.parseInt(args[i + 1]);
 				i++;
 			}
-			else if (args[i].equals("-textureprefix"))
+			else if (args[i].equals("--textureprefix") || args[i].equals("-t"))
 			{
 				texturePrefix = args[i + 1];
 				i++;
 			}
-			else if (args[i].equals("-s"))
+			else if (args[i].equals("--standard") || args[i].equals("-s"))
 			{
 				standardFormat = true;
 			}
