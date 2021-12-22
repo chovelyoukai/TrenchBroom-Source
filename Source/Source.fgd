@@ -497,7 +497,7 @@
 		0 : "No"
 		1 : "Yes"
 	]
-	detailvbsp(string) : "Detail.vbsp file" : "detail.v	sp" : "Detail.vbsp file to use for emitting detail props (found	in directory <root>/modname)"
+	detailvbsp(string) : "Detail.vbsp file" : "detail.vbsp" : "Detail.vbsp file to use for emitting detail props (found	in directory <root>/modname)"
 	detailmaterial(string) : "Detail material file" : "detail/detailsprites" : "Material for detail sprites to use for drawing detail props"
 	coldworld(choices) : "World is cold" : 0 =
 	[	
