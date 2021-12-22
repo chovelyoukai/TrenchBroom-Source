@@ -1,80 +1,64 @@
-## Things You Will Need:
-1. Steam
-2. Wine
-3. Java
-4. Momentum Mod
-5. Trenchbroom
+# TrenchBroom Source Tools
 
-## Setting Up the Environment:
-1. Open Steam.
-2. Enter `steam://open/console` in a web browser.
-3. Type `download_depot 243750 243752` into the Steam console to download the Source SDK 2013 for Windows (you need the compile tools from it).
-4. Copy the files from `~/.steam/steam/ubuntu12_32/steamapps/content/app_243750/depot_243752/bin` into the `bin` directory of your game (this is the top level bin directory, not the one in the `momentum` folder). The `bin` directory should now have a couple of subfolders, a ton of `.so` files that were already there, and a bunch of `.dll` and `.exe` folders that you copied into it.
+---
 
-5. Unzip the contents of this readme into your game folder (the one that has the `momentum` folder in it).
-6. Open Trenchbroom and create a new map with the "Generic" game type.
+## What is this?
 
-### IMPORTANT NOTE
-Always select ***Valve*** as the map type when creating a new map. Otherwise you could waste a lot of time blocking things out before you realize it doesn't compile properly.
+This is a collection of tools, config files, and textures for creating Source engine maps with TrenchBroom. This is geared mainly to mapping on Linux. It includes the following:
 
-7. In Trenchbroom, go to view > preferences and select the Generic game.
-8. Set the Game Path to your `momentum` folder.
-9. Now, use Trenchbroom as normal. You can use the included `tb_momentum.fgd` for your entities, included in the `momentum` folder.
+- MapToVmf, a tool for converting Quake .map files to Source VMFs
+- A ready-made Source engine game profile and FGD formatted for TrenchBroom
+- Special scripts for running native and Wine versions of VBSP, VRAD, and VVIS
+- A handful of basic tool and dev texture placeholders for working with TrenchBroom
 
-## Compiling Manually
+## How to use it
 
-You can use the included map2vmf.sh script in the bin folder to convert .map files to .vmf. The arguments are as follows:
-`map2vmf.sh OUTPUT_FILE [-lightmapscale n] INPUT_FILE`
+First, follow these steps:
 
-The `-lightmapscale` option sets the lightmap scale for the entire map. It defaults to 128.
+- Make sure you have Java installed.
+- Put the contents of the `scripts` folder in your `bin` or `bin/linux64` folder alongside your compilation tools.
+- Put the `textures` folder in your game directory. For example, for Team Fortress 2 it's the `tf` folder, for Momentum Mod it's the `momentum` folder, for Counter Strike: Source, it's the `cstrike` folder, and so on. You should have something like `tf/textures` when you're done.
 
-Then, you can use the included vbsp.sh, vvis.sh, and vrad.sh files to compile and copy the resulting bsp to wherever you want it to go. For example:
+- Put the `Source` folder in your TrenchBroom game profiles folder, probably in `~/.TrenchBroom/games`.
 
-```
-cp ../momentum/mapsrc/test.map ./test.map
-map2vmf.sh test.vmf -lightmapscale 16 test.map
-vbsp.sh test.vmf
-vvis.sh test.bsp
-vrad.sh -final -StaticPropPolys -StaticPropLighting test.bsp
-cp test.bsp ../momentum/maps/test.map
-```
+When you open TrenchBroom next, you should be able to select "Source" as an option. Now, all you need to do is set the correct game directory. This can be done by going to View > Preferences > Source > Game Path, and then entering the correct path for your game.
 
-## Setting Up Compilation In Trenchbroom
+Finally, when you make your maps, save them in `(game directory)/mapsrc`. For example, for Momentum Mod you would save your maps in `momentum/mapsrc`. If you want to use a different directory, you will need to change your compilation profile to use that folder instead.
 
-Instead of doing all the copying and compiling manually, or writing a script for it, you can set it up in Trenchbroom for you.
+## MapToVmf
 
-1. In Trenchbroom, go to Run > Compile Map...
-2. Click the leftmost + button to create a new profile.
-3. Set your working directory to be the bin directory with the compile tools in it with this parameter:
+MapToVmf is the heart of these tools. It has some special features to allow the creation of Source maps with Quake mapping tools. It's only been tested with TrenchBroom but it probably works with other editors too.
 
-`${GAME_DIR_PATH}/../bin/`
+### Options
 
-4. Assuming you are saving your maps in momentum/mapsrc, add a Copy File command with the middle + button and add these parameters:
+`--lightmapscale scale` or `-l scale`
 
-    Source: `${GAME_DIR_PATH}/mapsrc/${MAP_FULL_NAME}`
+> Specifies the global lightmap scale for every brush face. The default lightmap scale is 128.
 
-    Target: `${GAME_DIR_PATH}/../bin/`
+`--textureprefix prefix` or `-t prefix`
 
-5. Add a Run Tool command for the map2vmf conversion:
+> Sets a prefix to be used on every texture. For example, a texture of `GRASS01` and a prefix of `WORLD/` would produce an ouput of `WORLD/GRASS01`.
 
-    Tool: `${GAME_DIR_PATH}/../bin/map2vmf.sh`
+`--standard` or `-s`
 
-    Parameters: `${MAP_BASE_NAME}.vmf -lightmapscale <whatever> ${MAP_FULL_NAME}`
+> Convert from "standard" axial coordinates to Valve style coordinates. This is only partially working, and it is not recommended to use.
 
-6. Add a Run Tool Command for VBSP:
+### Entity I/O
 
-    Tool: `${GAME_DIR_PATH}/../bin/vbsp.sh`
+MapToVmf can handle specially formatted key-value pairs to output entity I/O connections to the VMF. The basic format is this:
 
-    Parameters: `${MAP_BASE_NAME}.vmf`
+> Key: `*name`
+>
+> Value: `Output,target,Input,Parameter,Delay,Repeat`
 
-7. Repeat step 6 for VVIS and VRAD
+For example, an input to change the color of an entity called `bob` when the owning entity is triggered, with a delay of 4.55 and a repeat of 9 could look like this:
 
-8. Add one last Copy File command to move the BSP into the maps folder:
+> Key: `*io3`
+>
+> Value: `OnTrigger,bob,Color,255 255 0,4.55,9`
 
-    Source: `${GAME_DIR_PATH}/../bin/${MAP_BASE_NAME}.bsp`
+The contents of the key are not important, as long as they start with an asterisk and are unique. Only the contents of the value will actually be used in the VMF.
 
-    Target: `${GAME_DIR_PATH}/maps/${MAP_BASE_NAME}.bsp`
+### Other Features
 
-9. If you want, you can add more commands to remove the unneeded `.prt`, `.log`, `.map`, etc. files. Just don't remove the original map file or you will lose all your work.
-
-10. Use the Test button to make sure it is running the correct commands, then once you are satisfied, you can use the Compile button to compile your map. Load it up in game as normal and have fun mapping.
+MapToVmf automatically deletes any patches it finds in the map. This might be useful for porting Quake III maps.
