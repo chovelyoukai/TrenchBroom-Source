@@ -1,6 +1,6 @@
 public class Plane
 {
-	public String material;
+	public String material, texturePrefix;
 	public int id, lightMapScale, smoothingGroups;
 	public float x1, y1, z1, x2, y2, z2, x3, y3, z3;
 	public float ux, uy, uz, uOff, uScale, vx, vy, vz, vOff, vScale;
@@ -107,7 +107,7 @@ public class Plane
 		System.out.printf("\t\t\t\"id\" \"%d\"\n", id);
 		System.out.printf("\t\t\t\"plane\" \"(%.2f %.2f %.2f) (%.2f %.2f %.2f) (%.2f %.2f %.2f)\"\n",
 			x1, y1, z1, x2, y2, z2, x3, y3, z3);
-		System.out.printf("\t\t\t\"material\" \"%s\"\n", material.toUpperCase());
+		System.out.printf("\t\t\t\"material\" \"%s%s\"\n", texturePrefix.toUpperCase(), material.toUpperCase());
 		System.out.printf("\t\t\t\"uaxis\" \"[%.2f %.2f %.2f %.2f] %.2f\"\n", ux, uy, uz, uOff, uScale);
 		System.out.printf("\t\t\t\"vaxis\" \"[%.2f %.2f %.2f %.2f] %.2f\"\n", vx, vy, vz, vOff, vScale);
 		System.out.printf("\t\t\t\"rotation\" \"%.2f\"\n", rotation);

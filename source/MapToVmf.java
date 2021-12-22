@@ -4,6 +4,7 @@ public class MapToVmf
 	{
 		int lightMapScale = 128;
 		String mapFile = "";
+		String texturePrefix = "";
 		boolean readMapFile = false;
 		boolean standardFormat = false;
 
@@ -18,6 +19,11 @@ public class MapToVmf
 			if (args[i].equals("-lightmapscale"))
 			{
 				lightMapScale = Integer.parseInt(args[i + 1]);
+				i++;
+			}
+			else if (args[i].equals("-textureprefix"))
+			{
+				texturePrefix = args[i + 1];
 				i++;
 			}
 			else if (args[i].equals("-s"))
@@ -41,6 +47,7 @@ public class MapToVmf
 		
 		boolean success = map.parseMap();
 		map.setLightMapScale(lightMapScale);
+		map.setTexturePrefix(texturePrefix);
 		
 		if (!success)
 		{

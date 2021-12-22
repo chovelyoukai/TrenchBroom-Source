@@ -140,6 +140,20 @@ public class Map
 		}
 	}
 	
+	void setTexturePrefix(String texturePrefix)
+	{
+		for (Entity e : entities)
+		{
+			for (Brush b : e.brushes)
+			{
+				for (Plane p : b.planes)
+				{
+					p.texturePrefix = texturePrefix;
+				}
+			}
+		}
+	}
+	
 	public void printMap()
 	{
 		for (Entity e : entities)
